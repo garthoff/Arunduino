@@ -1,12 +1,8 @@
 /**
- *  SevenSegDisp.h
- * SevenSegDisp.h
+ * SevenSegDisp.cpp 
  *
  * Library for driving 7 Segement display's using 74HC595- 8-bit serial-in,
  * serial or parallel-out shift register with output latches.
- *
- *
- *
  *
  *
  * Copyright (C) 2010  arunreddy
@@ -26,59 +22,95 @@
  */
 
 
- #ifndef SevenSegDisp_h     //To make sure header file is included only once.
- #define SevenSegDisp_h
  
 
  #include "WProgram.h"      //Include all the constants & datatypes w.r.t arduino enviroment. 
- #incldue "Print.h"         //Include all the print related funtcions like print and println.
+ #include "Print.h"         //Include all the print related funtcions like print and println.
 
  #include "SevenSegDisp.h"
 
  #include <avr/pgmspace.h>     //Include library to Store data in flash (program) memory instead of SRAM.
  #include "SevenSegDispFont.h" //Seven Segment display font library. 
  
- class SevenSegDispClass
- {
-   private:
-     
-     uint8_t _dataPin;      //Pins to push data to 74HC595
-     uint8_t _latchPin;
-     uint8_t _clockPin;
-    
-     uint8_t _registerCount; //Display length == total no of registers.
-     char*   _displayStr;    //String representation of data to be displayed on Seven Segment display.'
-
-    SevenSegDispClass::SevenSegDispClass( uint8_t dataPin
+    /**
+     * Constructor
+     * Intialize the Shift Register Pins.
+     * Register count is the total no of shift registers/displays used.
+     */
+    SevenSegDisp::SevenSegDisp( uint8_t dataPin
                       , uint8_t latchPin
                       , uint8_t clockPin
                       , uint8_t registerCount
+                      , uint8_t maxDispLen
                       ){
 
         this->_dataPin=dataPin;
         this->_latchPin=latchPin;
         this->_clockPin=clockPin;
-        this->_registerCount=registerCount;
+        this->_regsCount=registerCount;
+        this->_maxDispLen=maxDispLen;
+        char strBuf[this->_maxDispLen+1];
+        int i;
+        for(i=0;i<this->_maxDispLen;i+=1)
+        {
+           strBuf[i]=' ';
+        };
 
+
+        strBuf[this->_maxDispLen]='\0';
+      
+        this->setDispStr(strBuf);
+        begin();
     };
 
-    void SevenSegDispClass::begin(){
+    /**
+     * Intialize arduino in/out pins.
+     *
+     */
+    void SevenSegDisp::begin(){
      
       //Set Out Pins.
       pinMode(_dataPin,OUTPUT);
       pinMode(_clockPin,OUTPUT);
       pinMode(_latchPin,OUTPUT);
-
+      clear();
     };
 
 
-    void SevenSegDispClass::clear(){
+    void SevenSegDisp::clear(){
+      int i;
+      for(i=0;i < this->_maxDispLen ; i+=1){
+        _dispStr[i]=' ';
+      }
 
     };
      
- };
+     void SevenSegDisp::setDispStr(char* dispStr){    //Setter for dispString variable
+         this->_dispStr=dispStr; 
+     };
 
- extern SevenSedDispClass sevenSegDisp;
+     char* SevenSegDisp::getDispStr(){     //Getter for dispString variable
+       return this->_dispStr; 
+     };
 
- #endif
+
+     void SevenSegDisp::pushDispStr(){     //Push the data to Shift registers.
       
+       int displayInt;     
+       int i;
+ 
+       digitalWrite (_latchPin, LOW);
+     
+       for(i=0;i<5;i++){
+
+          displayInt=pgm_read_word_near( SevSegFont + _dispStr[i] - 0x20 );
+    
+          shiftOut(_dataPin, _clockPin, MSBFIRST, displayInt );
+       
+       }; 
+       
+       digitalWrite (_latchPin, HIGH);
+
+     };
+
+

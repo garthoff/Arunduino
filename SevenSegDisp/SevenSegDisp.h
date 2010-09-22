@@ -1,12 +1,8 @@
 /**
- *  SevenSegDisp.h
  * SevenSegDisp.h
  *
  * Library for driving 7 Segement display's using 74HC595- 8-bit serial-in,
  * serial or parallel-out shift register with output latches.
- *
- *
- *
  *
  *
  * Copyright (C) 2010  arunreddy
@@ -31,12 +27,13 @@
 
 
  #include "WProgram.h"      //Include all the constants & datatypes w.r.t arduino enviroment. 
- #incldue "Print.h"         //Include all the print related funtcions like print and println.
+ #include "Print.h"         //Include all the print related funtcions like print and println.
 
  #include <avr/pgmspace.h>     //Include library to Store data in flash (program) memory instead of SRAM.
  #include "SevenSegDispFont.h" //Seven Segment display font library. 
- 
- class SevenSegDispClass
+
+
+ class SevenSegDisp
  {
    private:
      
@@ -44,22 +41,26 @@
      uint8_t _latchPin;
      uint8_t _clockPin;
     
-     uint8_t _registerCount; //Display length == total no of registers.
-     char*   _displayStr;    //String representation of data to be displayed on Seven Segment display.'
+     uint8_t _regsCount;  //Display length == total no of registers.
+     char*   _dispStr;    //String representation of data to be displayed on Seven Segment display.'
+     uint8_t _maxDispLen;
 
    public:
-     SevenSegDispClass( uint8_t dataPin
-                      , uint8_t latchPin
-                      , uint8_t clockPin
-                      , uint8_t registerCount
-                      );
+     SevenSegDisp( uint8_t dataPin
+                   , uint8_t latchPin
+                   , uint8_t clockPin
+                   , uint8_t registerCount
+                   , uint8_t maxDispLen
+                   );
 
-     void begin();
-     void clear();
-     
+     void begin();            //Intialize arduino in/out pins.
+     void clear();            //Clear dispString and reset it to blank.
+     void setDispStr(char* dispStr);    //Setter for dispString variable
+     char* getDispStr();     //Getter for dispString variable
+     void pushDispStr();     //Push the data to Shift registers.
  };
 
- extern SevenSedDispClass sevenSegDisp;
+ //extern SevenSedDispClass sevenSegDisp;
 
  #endif
       

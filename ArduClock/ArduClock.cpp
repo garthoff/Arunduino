@@ -25,24 +25,17 @@
  */
 
 
- #ifndef ArduClock_h     //To make sure header file is included only once.
- #define ArduClock_h
-
-
  #include "WProgram.h"      //Include all the constants & datatypes w.r.t arduino enviroment. 
  #include "Print.h"         //Include all the print related funtcions like print and println.
 
  #include "../SevenSegDisp/SevenSegDisp.h"
-  
- class ArduClock
- {
-   private:
+ #include "ArduClock.h" 
+
+ /* 
      
      uint8_t _dataPin;      //Pins to push data to 74HC595
      uint8_t _latchPin;
      uint8_t _clockPin;
-     uint8_t _regsCount;
-     uint8_t _maxDispStrLen;
     
      uint8_t _btnMenu;
      uint8_t _btnOk;
@@ -68,14 +61,14 @@
      friend class SevenSegDisp;
 
    public:
-     ArduClock();           //Default constructor
+     ArduinoClock();           //Default constructor
 
      void begin();
      void clear();
 
      //Set Pins.
    //  void setLedPins(uint8_t redLedPin,uint8_t greenLedPin);                 
-     void setRegisterPins(uint8_t dataPin,uint8_t latchPin,uint8_t clockPin,uint8_t regsCount,uint8_t maxDispStrLen);
+     void setRegisterPins(uint8_t dataPin,uint8_t latchPin,uint8_t clockPin);
    //  void setBuzzerPin(uint8_t buzzerPin);
 
      //Display related functions.
@@ -93,8 +86,25 @@
     // uint32_t getPomodoroTimeInMillis();
     // char* getPomodoroTimeStr();
 
- };
+  */
 
+     ArduClock::ArduClock(){
 
- #endif
+     };           //Default constructor
       
+     
+     void ArduClock::setMenu(){
+       SevenSegDisp disp(_dataPin,_latchPin,_clockPin,_regsCount,_maxDispStrLen);
+       char abc[]="-1-2-3-";
+       disp.setDispStr(abc);
+       disp.pushDispStr();  
+     };
+
+
+     void ArduClock::setRegisterPins(uint8_t dataPin,uint8_t latchPin,uint8_t clockPin,uint8_t regsCount,uint8_t maxDispStrLen){
+        this->_dataPin=dataPin;
+        this->_latchPin=latchPin;
+        this->_clockPin=clockPin;
+        this->_regsCount=regsCount;
+        this->_maxDispStrLen=maxDispStrLen;
+     };
